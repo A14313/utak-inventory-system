@@ -248,6 +248,7 @@ function DashboardPage() {
 
 	return (
 		<div className="">
+			{/* utak inventory system */}
 			<Navbar title={toCapitalize({ phrase: 'utak inventory system', eachWord: true })} />
 
 			<div className="flex justify-end gap-[.5em] mt-[2em]">
