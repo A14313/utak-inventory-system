@@ -6,109 +6,55 @@ import { BiPencil, BiTrashAlt } from 'react-icons/bi';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Firebase
 import app from 'src/dbConnection/firebase';
-import { getDatabase, ref, set, push, get, remove } from 'firebase/database';
+import { getDatabase, ref, set, push, get } from 'firebase/database';
 
 // Components
-import { Navbar, Modal, Table } from 'src/Components';
+import { Modal, Table, AddProductForm, Badge } from 'src/Components';
 
 // Utils
-import toCamelCase from 'src/utils/toCamelCase';
 import toCapitalize from 'src/utils/toCapitalize';
 import generateDateTime from 'src/utils/generateDateTime';
 import toastConfigs from 'src/utils/toastConfigs';
-
-// Schema
-import productsSchema from 'src/formSchemas/productsSchema';
+import { CATEGORIES } from 'src/utils/constants';
+import deleteProduct from 'src/utils/deleteProduct';
 
 const tableHeadings = ['Name', 'Categories', 'Stock', 'Price', 'Cost', 'Actions'];
 const tableDataCells = ['name', 'categories', 'stock', 'price', 'cost', 'actions'];
 
-const formInputs = [
-	{
-		id: uuid(),
-		name: 'Name',
-		placeholder: 'Product name',
-		type: 'text',
-	},
-	{
-		id: uuid(),
-		name: 'Stock',
-		placeholder: 'How many in stocks?',
-		type: 'number',
-		step: 'any',
-	},
-	{
-		id: uuid(),
-		name: 'Price',
-		placeholder: 'How much per piece',
-		type: 'number',
-		step: 'any',
-	},
-	{
-		id: uuid(),
-		name: 'Cost',
-		placeholder: 'How much is the cost',
-		type: 'number',
-		step: 'any',
-	},
-];
-
-const categories = [
-	{ displayName: 'Beverages' },
-	{ displayName: 'Appetizers' },
-	{ displayName: 'Main Courses' },
-	{ displayName: 'Side Dishes' },
-	{ displayName: 'Desserts' },
-	{ displayName: 'Condiments' },
-	{ displayName: 'Ingredients' },
-	{ displayName: 'Supplies' },
-	{ displayName: 'Cleaning Supplies' },
-	{ displayName: 'Miscellaneous' },
-];
-
 function DashboardPage() {
-	const [selectedCategories, setSelectedCategories] = useState(['mainCourses']);
+	const navigate = useNavigate();
 	const [addProductModalIsOpen, setAddProductModalIsOpen] = useState(false);
+	// Delete function states
 	const [deleteProductDialogIsOpen, setDeleteProductDialogIsOpen] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
 
-	// Hook form
-	const {
-		register: addProductRegister,
-		handleSubmit: addProductHandleSubmit,
-		formState: { errors: addProductErrors, isSubmitting: addProductIsSubmitting },
-		reset: addProductResetForm,
-	} = useForm({
-		resolver: zodResolver(productsSchema),
-	});
-
 	// Fetch data
-	const fetchProductsData = async () => {
-		const db = getDatabase(app);
-		const dbRef = ref(db, 'Inventory');
-		const snapshot = await get(dbRef);
-		if (snapshot.exists()) {
-			const temporaryData = snapshot.val();
-			const data = Object.keys(temporaryData).map((el) => {
-				return { ...temporaryData[el], firebaseId: el };
-			});
-
-			return data;
-		}
-
-		return null;
-	};
-
 	const {
 		data: productsData,
 		isLoading: productsDataIsLoading,
 		isError: productsDataIsError,
 		refetch,
 	} = useQuery({
-		queryFn: fetchProductsData,
+		queryFn: async () => {
+			const db = getDatabase(app);
+			const dbRef = ref(db, 'Products');
+			const snapshot = await get(dbRef);
+			if (snapshot.exists()) {
+				const temporaryData = snapshot.val();
+				const data = Object.keys(temporaryData).map((firebaseId) => {
+					return { ...temporaryData[firebaseId], id: firebaseId };
+				});
+				const sortedData = data.sort((a, b) => b.updatedAt - a.updatedAt); // Sort by date descending
+
+				return sortedData;
+			}
+
+			return null;
+		},
 		queryKey: ['productsData'],
 	});
 
@@ -117,24 +63,34 @@ function DashboardPage() {
 	}
 
 	// Write data
-	const addProductOnSubmit = async (data) => {
+	const addProduct = async ({ data }) => {
 		const formattedData = {
 			...data,
-			cost: Number(data.cost),
-			price: Number(data.price),
-			stock: Number(data.stock),
-			categories: selectedCategories,
-			id: uuid(),
+			cost: Number(data?.cost),
+			price: Number(data?.price),
+			stock: Number(data?.stock),
 			createdAt: generateDateTime({ isUnix: true }),
 			updatedAt: generateDateTime({ isUnix: true }),
 		};
 
 		try {
 			const db = getDatabase(app);
-			const newDocRef = push(ref(db, 'Inventory'));
+			const dbRef = ref(db, 'Products');
+			const newDocRef = push(dbRef);
 
 			await toast.promise(
-				set(newDocRef, formattedData),
+				new Promise((resolve, reject) => {
+					const randomNum = Math.floor(Math.random() * 5000);
+					console.log(randomNum);
+					setTimeout(() => {
+						if (randomNum <= 3000) {
+							set(newDocRef, formattedData);
+							resolve(formattedData);
+						} else {
+							reject();
+						}
+					}, randomNum);
+				}),
 				{
 					pending: 'Creating product',
 					success: 'Successfully added the product',
@@ -144,39 +100,13 @@ function DashboardPage() {
 
 			refetch();
 			setAddProductModalIsOpen(false);
-			addProductResetForm();
-			setSelectedCategories(['mainCourses']);
-		} catch (e) {
-			console.error('Something went wrong', e);
+			// Reset the form
+		} catch (err) {
+			console.error('Something went wrong', err);
 		}
-	};
-
-	// Delete Data
-	const removeEntry = async (id) => {
-		const db = getDatabase(app);
-		const dbRef = ref(db, 'Inventory/' + id);
-
-		await toast.promise(
-			remove(dbRef),
-			{
-				pending: 'Deleting product',
-				success: 'Successfully deleted the product',
-				error: 'Something went wrong while deleting the product',
-			},
-			toastConfigs,
-		);
-		refetch();
 	};
 
 	// Functions
-	const handleCategoryCheckboxChange = (categoryId) => {
-		const isChecked = selectedCategories.includes(categoryId);
-		if (isChecked) {
-			setSelectedCategories((prevState) => prevState.filter((item) => item !== categoryId));
-		} else {
-			setSelectedCategories((prevState) => [...prevState, categoryId]);
-		}
-	};
 
 	const formattedTableData = productsData?.map((el) => {
 		return {
@@ -186,9 +116,11 @@ function DashboardPage() {
 				<div className="flex flex-wrap gap-[.5em]">
 					{el?.categories?.map((el, index) => {
 						return (
-							<span key={index} className="badge badge-outline">
-								{toCapitalize({ phrase: el })}
-							</span>
+							<Badge
+								key={index}
+								label={toCapitalize({ phrase: el })}
+								labelStyles="border-gray-300 dark:border-gray-500 text-sm cursor-default"
+							/>
 						);
 					})}
 				</div>
@@ -199,11 +131,7 @@ function DashboardPage() {
 						className="btn btn-circle btn-ghost"
 						title="Edit"
 						onClick={() => {
-							console.log(el.firebaseId);
-							toast.info(
-								"I wasn't able to do this due to lack of time 😞",
-								toastConfigs,
-							);
+							navigate(`/edit/${el.id}`);
 						}}>
 						<BiPencil className="text-info" />
 					</button>
@@ -211,8 +139,8 @@ function DashboardPage() {
 						className="btn btn-circle btn-ghost"
 						title="Delete"
 						onClick={() => {
-							openDeleteProductDialog();
-							setDeleteId(el.firebaseId);
+							setDeleteId(el.id);
+							setDeleteProductDialogIsOpen(true);
 						}}>
 						<BiTrashAlt className="text-error" />
 					</button>
@@ -228,30 +156,31 @@ function DashboardPage() {
 
 	const closeAddProductModal = () => {
 		setAddProductModalIsOpen(false);
-		addProductResetForm();
-		setSelectedCategories(['mainCourses']);
 	};
 
-	const openDeleteProductDialog = () => {
-		setDeleteProductDialogIsOpen(true);
+	// Delete
+	const handleDelete = async ({ id }) => {
+		await toast.promise(
+			deleteProduct({ id }),
+			{
+				pending: 'Deleting product',
+				success: 'Successfully deleted the product',
+				error: 'Something went wrong while deleting the product',
+			},
+			toastConfigs,
+		);
 	};
 
 	const closeDeleteProductDialog = () => {
 		setDeleteProductDialogIsOpen(false);
 		setDeleteId('');
-	};
-
-	const handleDelete = () => {
-		removeEntry(deleteId);
-		closeDeleteProductDialog();
+		refetch();
 	};
 
 	return (
-		<div className="">
-			{/* utak inventory system */}
-			<Navbar title={toCapitalize({ phrase: 'utak inventory system', eachWord: true })} />
-
-			<div className="flex justify-end gap-[.5em] mt-[2em]">
+		<>
+			{/* Buttons */}
+			<div className="flex justify-end gap-[.5em]">
 				{productsDataIsLoading ? (
 					<>
 						<div className="skeleton w-[7rem] h-[2rem] sm2:w-[10rem] sm2:h-[3rem]"></div>
@@ -268,7 +197,7 @@ function DashboardPage() {
 							Refresh data
 						</button>
 						<button
-							className="btn btn-primary text-sm text-slate-50"
+							className="btn btn-primary text-sm text-slate-50 dark:text-slate-800"
 							onClick={openAddProductModal}>
 							Add new product
 						</button>
@@ -297,91 +226,31 @@ function DashboardPage() {
 			<Modal
 				modalTitle="Add new product"
 				isOpen={addProductModalIsOpen}
-				closeModal={closeAddProductModal}
 				submitText="Add product"
-				formToSubmit="addProductForm"
-				isSubmitting={addProductIsSubmitting}>
-				<form
-					id="addProductForm"
-					className="my-[1em] space-y-[1em]"
-					onSubmit={addProductHandleSubmit(addProductOnSubmit)}>
-					{formInputs.map((el) => {
-						return (
-							<>
-								<label
-									key={el.id}
-									className="input input-bordered flex items-center gap-[1em] cursor-pointer">
-									{el.name}
-									<input
-										{...addProductRegister(toCamelCase({ phrase: el.name }))}
-										type={el.type}
-										className="grow"
-										placeholder={el.placeholder}
-										step={el.step || null}
-									/>
-								</label>
-
-								{addProductErrors?.[toCamelCase({ phrase: el.name })] && (
-									<p className="text-error">
-										{
-											addProductErrors[toCamelCase({ phrase: el.name })]
-												?.message
-										}
-									</p>
-								)}
-							</>
-						);
-					})}
-					<div className="py-[1em]">
-						<h3 className="mb-[1em] font-medium">Categories</h3>
-						<div className="flex flex-wrap gap-[.5em]">
-							{categories.map((el) => {
-								return (
-									<div
-										key={toCamelCase({ phrase: el.displayName })}
-										className="form-control">
-										<label
-											className={twMerge(
-												'label cursor-pointer badge p-[1em]',
-												selectedCategories.includes(
-													toCamelCase({ phrase: el.displayName }),
-												)
-													? 'badge-primary text-slate-50'
-													: '',
-											)}>
-											<span className="label-text">{el.displayName}</span>
-											<input
-												type="checkbox"
-												className="toggle sr-only"
-												checked={selectedCategories.includes(
-													toCamelCase({ phrase: el.displayName }),
-												)}
-												onChange={() =>
-													handleCategoryCheckboxChange(
-														toCamelCase({ phrase: el.displayName }),
-													)
-												}
-											/>
-										</label>
-									</div>
-								);
-							})}
-						</div>
-					</div>
-				</form>
+				includeModalActions={false}>
+				<AddProductForm
+					categories={CATEGORIES}
+					onSubmit={(data) => {
+						addProduct({ data });
+					}}
+					handleCancel={closeAddProductModal}
+				/>
 			</Modal>
 
 			{/* Delete Product Dialog */}
 			<Modal
-				modalTitle="Delete this product?"
+				modalTitle="Delete this product"
 				isOpen={deleteProductDialogIsOpen}
 				closeModal={closeDeleteProductDialog}
+				handleSubmit={() => {
+					handleDelete({ id: deleteId });
+					closeDeleteProductDialog();
+				}}
 				submitText="Delete product"
-				handleSubmitOnClick={handleDelete}
-				submitButtonStyles="btn-error text-white">
+				submitButtonStyles="btn-error text-white dark:text-white">
 				<p className="py-[1.3em]">Are you sure you want to delete this product?</p>
 			</Modal>
-		</div>
+		</>
 	);
 }
 
