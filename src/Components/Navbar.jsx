@@ -1,9 +1,17 @@
 import PropTypes from 'prop-types';
-function Navbar({ title }) {
+import { twMerge } from 'tailwind-merge';
+import { Link } from 'react-router-dom';
+function Navbar({ title, className }) {
 	return (
-		<div className="navbar bg-base-100 z-10 sticky top-[1%] drop-shadow-lg rounded-lg">
+		<div
+			className={twMerge(
+				'navbar bg-base-100 z-10 sticky top-[1%] drop-shadow-lg rounded-lg',
+				className,
+			)}>
 			<div className="flex-1">
-				<a className="btn btn-ghost text-xl">{title}</a>
+				<Link className="btn btn-ghost text-xl" to="/">
+					{title}
+				</Link>
 			</div>
 		</div>
 	);
@@ -11,6 +19,7 @@ function Navbar({ title }) {
 
 Navbar.propTypes = {
 	title: PropTypes.string,
+	className: PropTypes.string,
 };
 
 export default Navbar;
