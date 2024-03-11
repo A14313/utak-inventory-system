@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
+import { twMerge } from 'tailwind-merge';
 
 // Utils
 import toCamelCase from 'src/utils/toCamelCase';
 import toCapitalize from 'src/utils/toCapitalize';
-function Table({ data, tableHeadings, tableDataCells }) {
+function Table({ data, tableHeadings, tableDataCells, tableContainerStyles }) {
 	return (
-		<div className="overflow-x-auto max-h-[700px]">
+		<div className={twMerge('overflow-x-auto max-h-[700px]', tableContainerStyles)}>
 			<table className="table table-zebra table-pin-rows table-pin-cols table-md med:table-lg">
 				<thead>
 					<tr>
@@ -43,6 +44,7 @@ Table.propTypes = {
 	data: PropTypes.array,
 	tableHeadings: PropTypes.array,
 	tableDataCells: PropTypes.array,
+	tableContainerStyles: PropTypes.string,
 };
 
 export default Table;

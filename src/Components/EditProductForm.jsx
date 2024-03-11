@@ -13,6 +13,7 @@ import generateDateTime from 'src/utils/generateDateTime';
 
 // Components
 import Badge from './Badge';
+import Input from './Input';
 
 // Schema
 import productsSchema from 'src/formSchemas/productsSchema';
@@ -82,8 +83,6 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 		return onSubmit(formattedData);
 	};
 
-	console.log('Edit', isSubmitting);
-
 	return (
 		<form
 			id={formId}
@@ -92,16 +91,13 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 			{formInputs.map((el) => {
 				return (
 					<React.Fragment key={el.id}>
-						<label className="input input-bordered flex items-center gap-[1em] cursor-pointer">
-							{el.name}
-							<input
-								{...register(toCamelCase({ phrase: el.name }))}
-								className="grow"
-								type={el.type}
-								placeholder={el.placeholder}
-								step={el.step || null}
-							/>
-						</label>
+						<Input
+							{...register(toCamelCase({ phrase: el.name }))}
+							label={el.name}
+							type={el.type}
+							placeholder={el.placeholder}
+							step={el.step || null}
+						/>
 
 						{errors?.[toCamelCase({ phrase: el.name })] && (
 							<p className="text-error">
@@ -112,7 +108,7 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 				);
 			})}
 			<div className="py-[1em]">
-				<h3 className="mb-[1em] font-medium">Categories</h3>
+				<h3 className="text-lg mb-[1em] font-medium">Categories</h3>
 				<div className="flex flex-wrap gap-[.5em]">
 					{categories.map((el) => {
 						return (
@@ -135,7 +131,7 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 					})}
 				</div>
 			</div>
-			<div className="flex justify-end gap-[.6em]">
+			<div className="flex justify-end gap-[.6em] py-[1em]">
 				<button
 					className={twMerge('btn btn-ghost', isSubmitting ? 'btn-disabled' : '')}
 					type="button"

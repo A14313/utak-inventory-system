@@ -75,25 +75,30 @@ function EditPage() {
 
 	return (
 		<>
-			{product ? (
-				<EditProductForm
-					preloadedValues={formattedProduct}
-					onSubmit={updateProduct}
-					categories={CATEGORIES}
-					formId="editForm"
-				/>
-			) : (
-				// For loading
-				<div className="space-y-[1em]">
-					<div className="skeleton w-[90%] h-10"></div>
-					<div className="skeleton w-[75%] h-10"></div>
-					<div className="flex flex-wrap gap-[1em]">
-						<div className="skeleton w-[100px] h-[30px]"></div>
-						<div className="skeleton w-[100px] h-[30px]"></div>
-						<div className="skeleton w-[100px] h-[30px]"></div>
+			<div className="container max-w-[600px]">
+				<h1 className="font-bold text-xl sm1:text-3xl sm2:text-4xl mt-[1em] py-[.5em] text-start">
+					Update product
+				</h1>
+				{product ? (
+					<EditProductForm
+						preloadedValues={formattedProduct}
+						onSubmit={updateProduct}
+						categories={CATEGORIES}
+						formId="editForm"
+					/>
+				) : (
+					// For loading
+					<div className="space-y-[1em]">
+						<div className="skeleton w-[90%] h-10"></div>
+						<div className="skeleton w-[75%] h-10"></div>
+						<div className="flex flex-wrap gap-[1em]">
+							<div className="skeleton w-[100px] h-[30px]"></div>
+							<div className="skeleton w-[100px] h-[30px]"></div>
+							<div className="skeleton w-[100px] h-[30px]"></div>
+						</div>
 					</div>
-				</div>
-			)}
+				)}
+			</div>
 
 			{/* Update product Dialog */}
 			<Modal
@@ -103,7 +108,7 @@ function EditPage() {
 				submitText="Update product"
 				handleSubmit={handleSubmitModal}
 				formToSubmit="editForm">
-				<p className="py-[1.3em]">Are you sure you want to update this product?</p>
+				<p>Are you sure you want to update this product?</p>
 			</Modal>
 		</>
 	);

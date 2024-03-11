@@ -32,6 +32,9 @@ function DashboardPage() {
 	const [deleteProductDialogIsOpen, setDeleteProductDialogIsOpen] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
 
+	// Testing
+	const [disableButton, setDisableButton] = useState(false);
+
 	// Fetch data
 	const {
 		data: productsData,
@@ -73,10 +76,13 @@ function DashboardPage() {
 			updatedAt: generateDateTime({ isUnix: true }),
 		};
 
+		console.log(formattedData);
+
 		try {
 			const db = getDatabase(app);
 			const dbRef = ref(db, 'Products');
 			const newDocRef = push(dbRef);
+			setDisableButton(true);
 
 			await toast.promise(
 				new Promise((resolve, reject) => {
@@ -88,17 +94,20 @@ function DashboardPage() {
 							resolve(formattedData);
 						} else {
 							reject();
+							setDisableButton(false);
 						}
 					}, randomNum);
 				}),
 				{
 					pending: 'Creating product',
 					success: 'Successfully added the product',
+					error: 'An error occurred while creating the product. Please try again later.',
 				},
 				toastConfigs,
 			);
 
 			refetch();
+			setDisableButton(false);
 			setAddProductModalIsOpen(false);
 			// Reset the form
 		} catch (err) {
@@ -107,7 +116,6 @@ function DashboardPage() {
 	};
 
 	// Functions
-
 	const formattedTableData = productsData?.map((el) => {
 		return {
 			...el,
@@ -119,7 +127,7 @@ function DashboardPage() {
 							<Badge
 								key={index}
 								label={toCapitalize({ phrase: el })}
-								labelStyles="border-gray-300 dark:border-gray-500 text-sm cursor-default"
+								labelStyles="border-gray-300 dark:border-gray-500 sm2:text-sm truncate cursor-default"
 							/>
 						);
 					})}
@@ -133,7 +141,7 @@ function DashboardPage() {
 						onClick={() => {
 							navigate(`/edit/${el.id}`);
 						}}>
-						<BiPencil className="text-info" />
+						<BiPencil className="text-info" size="1rem" />
 					</button>
 					<button
 						className="btn btn-circle btn-ghost"
@@ -142,7 +150,7 @@ function DashboardPage() {
 							setDeleteId(el.id);
 							setDeleteProductDialogIsOpen(true);
 						}}>
-						<BiTrashAlt className="text-error" />
+						<BiTrashAlt className="text-error" size="1rem" />
 					</button>
 				</div>
 			),
@@ -198,7 +206,8 @@ function DashboardPage() {
 						</button>
 						<button
 							className="btn btn-primary text-sm text-slate-50 dark:text-slate-800"
-							onClick={openAddProductModal}>
+							onClick={openAddProductModal}
+							disabled={disableButton}>
 							Add new product
 						</button>
 					</>
@@ -224,16 +233,19 @@ function DashboardPage() {
 
 			{/* Add Product Modal*/}
 			<Modal
-				modalTitle="Add new product"
 				isOpen={addProductModalIsOpen}
-				submitText="Add product"
-				includeModalActions={false}>
+				modalTitle="Add new product"
+				submitText="Add Product"
+				includeModalActions={false}
+				closeModal={() => setAddProductModalIsOpen(false)}>
 				<AddProductForm
 					categories={CATEGORIES}
+					formId="forms"
 					onSubmit={(data) => {
-						addProduct({ data });
+						return addProduct({ data });
 					}}
-					handleCancel={closeAddProductModal}
+					// resetTheForm={resetTheForm}
+					handleCancel={() => setAddProductModalIsOpen(false)}
 				/>
 			</Modal>
 
@@ -248,7 +260,7 @@ function DashboardPage() {
 				}}
 				submitText="Delete product"
 				submitButtonStyles="btn-error text-white dark:text-white">
-				<p className="py-[1.3em]">Are you sure you want to delete this product?</p>
+				<p>Are you sure you want to delete this product?</p>
 			</Modal>
 		</>
 	);

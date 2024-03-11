@@ -11,6 +11,7 @@ import toCapitalize from 'src/utils/toCapitalize';
 
 // Components
 import Badge from './Badge';
+import Input from './Input';
 
 // Schema
 import productsSchema from 'src/formSchemas/productsSchema';
@@ -51,12 +52,13 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
+		reset,
 	} = useForm({
 		resolver: zodResolver(productsSchema),
 	});
 
 	// Functions
-	const handleCategoryChange = (category) => {
+	const handleCategoryChange = ({ category }) => {
 		const isChecked = selectedCategories.includes(category);
 		if (isChecked) {
 			setSelectedCategories((prevState) => prevState.filter((item) => item !== category));
@@ -73,21 +75,18 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 	return (
 		<form
 			id={formId}
-			className="my-[1em] space-y-[1em]"
+			className="mb-[1em] space-y-[1em]"
 			onSubmit={handleSubmit(onSubmitHandler)}>
 			{formInputs.map((el) => {
 				return (
 					<React.Fragment key={el.id}>
-						<label className="input input-bordered flex items-center gap-[1em] cursor-pointer">
-							{el.name}
-							<input
-								{...register(toCamelCase({ phrase: el.name }))}
-								type={el.type}
-								className="grow"
-								placeholder={el.placeholder}
-								step={el.step || null}
-							/>
-						</label>
+						<Input
+							{...register(toCamelCase({ phrase: el.name }))}
+							label={el.name}
+							type={el.type}
+							placeholder={el.placeholder}
+							step={el.step || null}
+						/>
 
 						{errors?.[toCamelCase({ phrase: el.name })] && (
 							<p className="text-error">
@@ -98,7 +97,7 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 				);
 			})}
 			<div className="py-[1em]">
-				<h3 className="mb-[1em] font-medium">Categories</h3>
+				<h3 className="text-lg mb-[1em] font-medium">Categories</h3>
 				<div className="flex flex-wrap gap-[.5em]">
 					{categories.map((el) => {
 						return (
@@ -111,9 +110,9 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 										toCapitalize({ phrase: el.DISPLAY_NAME }),
 									)}
 									onChange={() =>
-										handleCategoryChange(
-											toCapitalize({ phrase: el.DISPLAY_NAME }),
-										)
+										handleCategoryChange({
+											category: toCapitalize({ phrase: el.DISPLAY_NAME }),
+										})
 									}
 								/>
 							</div>
@@ -125,7 +124,11 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 				<button
 					className={twMerge('btn btn-ghost', isSubmitting ? 'btn-disabled' : '')}
 					type="button"
-					onClick={handleCancel}
+					onClick={() => {
+						handleCancel();
+						reset();
+						setSelectedCategories([]);
+					}}
 					disabled={isSubmitting}>
 					Cancel
 				</button>

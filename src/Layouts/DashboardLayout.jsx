@@ -9,7 +9,7 @@ function DashboardLayout() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="min-h-[100dvh]">
-				<div className="container mx-auto min-w-[95%] sm2:min-w-[unset]">
+				<div className="container min-w-[95%] sm2:min-w-[unset]">
 					<Navbar
 						className="mb-[2em]"
 						title={toCapitalize({ phrase: 'utak inventory system', eachWord: true })}
