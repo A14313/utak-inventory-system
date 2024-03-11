@@ -33,10 +33,7 @@ function DashboardPage() {
 	const [deleteId, setDeleteId] = useState('');
 
 	// Testing
-	const [dialogIsOpen, setDialogIsOpen] = useState(false);
-	const [isConfirmed, setIsConfirmed] = useState(false);
 	const [disableButton, setDisableButton] = useState(false);
-	const [resetTheForm, setResetTheForm] = useState(false);
 
 	// Fetch data
 	const {
@@ -130,7 +127,7 @@ function DashboardPage() {
 							<Badge
 								key={index}
 								label={toCapitalize({ phrase: el })}
-								labelStyles="border-gray-300 dark:border-gray-500 text-sm cursor-default"
+								labelStyles="border-gray-300 dark:border-gray-500 sm2:text-sm truncate cursor-default"
 							/>
 						);
 					})}
@@ -144,7 +141,7 @@ function DashboardPage() {
 						onClick={() => {
 							navigate(`/edit/${el.id}`);
 						}}>
-						<BiPencil className="text-info" />
+						<BiPencil className="text-info" size="1rem" />
 					</button>
 					<button
 						className="btn btn-circle btn-ghost"
@@ -153,7 +150,7 @@ function DashboardPage() {
 							setDeleteId(el.id);
 							setDeleteProductDialogIsOpen(true);
 						}}>
-						<BiTrashAlt className="text-error" />
+						<BiTrashAlt className="text-error" size="1rem" />
 					</button>
 				</div>
 			),

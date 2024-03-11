@@ -6,8 +6,8 @@ function Badge({ isActive, label, onChange, labelStyles }) {
 		<div className="form-control">
 			<label
 				className={twMerge(
-					'label cursor-pointer border border-solid dark:border-slate-800 rounded-full px-[.8em] py-[.2em] text-center transition-colors duration-500',
-					isActive ? 'bg-primary text-slate-50 dark:text-slate-800' : '',
+					'text-sm sm2:text-base text-center label cursor-pointer border border-solid dark:border-slate-800 rounded-full px-[.8em] py-[.2em] transition-colors duration-500',
+					isActive ? 'bg-accent text-slate-50 dark:text-slate-800' : '',
 					labelStyles,
 				)}>
 				<span>{label}</span>

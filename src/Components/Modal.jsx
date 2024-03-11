@@ -47,7 +47,7 @@ function Modal({
 				<div className="px-[1.5em] pt-[1em]">{children}</div>
 
 				{includeModalActions && (
-					<div className="modal-action px-[1.5em] pb-[1.5em] border border-error">
+					<div className="modal-action px-[1.5em] pb-[1.5em] lrg:pt-[1.5em]">
 						<form method="dialog">
 							{/* if there is a button in form, it will close the modal */}
 							<button className="btn btn-ghost" onClick={handleClose}>

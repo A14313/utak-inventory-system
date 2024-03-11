@@ -11,7 +11,15 @@ export default {
 			xl: '1200px',
 			'2xl': '1400px',
 		},
-		extend: {},
+		extend: {
+			container: {
+				center: true,
+				padding: {
+					DEFAULT: '.5em',
+					sm1: '1em',
+				},
+			},
+		},
 	},
 	daisyui: {
 		themes: [
