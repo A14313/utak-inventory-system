@@ -1,12 +1,8 @@
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { useForm } from 'react-hook-form';
-import { twMerge } from 'tailwind-merge';
 import { BiPencil, BiTrashAlt } from 'react-icons/bi';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // Firebase
 import app from 'src/dbConnection/firebase';
@@ -22,8 +18,8 @@ import toastConfigs from 'src/utils/toastConfigs';
 import { CATEGORIES } from 'src/utils/constants';
 import deleteProduct from 'src/utils/deleteProduct';
 
-const tableHeadings = ['Name', 'Categories', 'Stock', 'Price', 'Cost', 'Actions'];
-const tableDataCells = ['name', 'categories', 'stock', 'price', 'cost', 'actions'];
+const tableHeadings = ['Name', 'Stock', 'Price', 'Cost', 'Categories', 'Actions'];
+const tableDataCells = ['name', 'stock', 'price', 'cost', 'categories', 'actions'];
 
 function DashboardPage() {
 	const navigate = useNavigate();
@@ -66,7 +62,7 @@ function DashboardPage() {
 	}
 
 	// Write data
-	const addProduct = async ({ data }) => {
+	const addProduct = async ({ data, resetForm }) => {
 		const formattedData = {
 			...data,
 			cost: Number(data?.cost),
@@ -75,8 +71,6 @@ function DashboardPage() {
 			createdAt: generateDateTime({ isUnix: true }),
 			updatedAt: generateDateTime({ isUnix: true }),
 		};
-
-		console.log(formattedData);
 
 		try {
 			const db = getDatabase(app);
@@ -110,8 +104,10 @@ function DashboardPage() {
 			setDisableButton(false);
 			setAddProductModalIsOpen(false);
 			// Reset the form
+			resetForm();
 		} catch (err) {
 			console.error('Something went wrong', err);
+			refetch();
 		}
 	};
 
@@ -141,7 +137,7 @@ function DashboardPage() {
 						onClick={() => {
 							navigate(`/edit/${el.id}`);
 						}}>
-						<BiPencil className="text-info" size="1rem" />
+						<BiPencil className="text-info" size="1.2rem" />
 					</button>
 					<button
 						className="btn btn-circle btn-ghost"
@@ -150,7 +146,7 @@ function DashboardPage() {
 							setDeleteId(el.id);
 							setDeleteProductDialogIsOpen(true);
 						}}>
-						<BiTrashAlt className="text-error" size="1rem" />
+						<BiTrashAlt className="text-error" size="1.2rem" />
 					</button>
 				</div>
 			),
@@ -160,10 +156,6 @@ function DashboardPage() {
 	// Modals and Dialogs
 	const openAddProductModal = () => {
 		setAddProductModalIsOpen(true);
-	};
-
-	const closeAddProductModal = () => {
-		setAddProductModalIsOpen(false);
 	};
 
 	// Delete
@@ -240,11 +232,11 @@ function DashboardPage() {
 				closeModal={() => setAddProductModalIsOpen(false)}>
 				<AddProductForm
 					categories={CATEGORIES}
-					formId="forms"
-					onSubmit={(data) => {
-						return addProduct({ data });
+					// formId="forms"
+					onSubmit={(data, resetForm) => {
+						setAddProductModalIsOpen(false);
+						return addProduct({ data, resetForm });
 					}}
-					// resetTheForm={resetTheForm}
 					handleCancel={() => setAddProductModalIsOpen(false)}
 				/>
 			</Modal>

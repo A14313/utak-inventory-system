@@ -1,5 +1,11 @@
 # Changelogs
 
+## 03-11-24(add-router) v1.2.3
+
+-   Change the order of the column in Table
+-   Added the `reset` function after the form successfully submitted
+-   Added `focus-visible` in the `Badge` component
+
 ## 03-11-24(add-router) v1.2.2
 
 -   Modified the `container` tailwind utility class

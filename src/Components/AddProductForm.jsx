@@ -15,6 +15,7 @@ import Input from './Input';
 
 // Schema
 import productsSchema from 'src/formSchemas/productsSchema';
+import { useEffect } from 'react';
 
 const formInputs = [
 	{
@@ -69,7 +70,12 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 
 	const onSubmitHandler = (data) => {
 		const formattedData = { ...data, categories: selectedCategories };
-		return onSubmit(formattedData);
+		return onSubmit(formattedData, resetForm);
+	};
+
+	const resetForm = () => {
+		reset();
+		setSelectedCategories([]);
 	};
 
 	return (
