@@ -51,12 +51,13 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
+		reset,
 	} = useForm({
 		resolver: zodResolver(productsSchema),
 	});
 
 	// Functions
-	const handleCategoryChange = (category) => {
+	const handleCategoryChange = ({ category }) => {
 		const isChecked = selectedCategories.includes(category);
 		if (isChecked) {
 			setSelectedCategories((prevState) => prevState.filter((item) => item !== category));
@@ -73,7 +74,7 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 	return (
 		<form
 			id={formId}
-			className="my-[1em] space-y-[1em]"
+			className="mb-[1em] space-y-[1em]"
 			onSubmit={handleSubmit(onSubmitHandler)}>
 			{formInputs.map((el) => {
 				return (
@@ -111,9 +112,9 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 										toCapitalize({ phrase: el.DISPLAY_NAME }),
 									)}
 									onChange={() =>
-										handleCategoryChange(
-											toCapitalize({ phrase: el.DISPLAY_NAME }),
-										)
+										handleCategoryChange({
+											category: toCapitalize({ phrase: el.DISPLAY_NAME }),
+										})
 									}
 								/>
 							</div>
@@ -125,7 +126,11 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 				<button
 					className={twMerge('btn btn-ghost', isSubmitting ? 'btn-disabled' : '')}
 					type="button"
-					onClick={handleCancel}
+					onClick={() => {
+						handleCancel();
+						reset();
+						setSelectedCategories([]);
+					}}
 					disabled={isSubmitting}>
 					Cancel
 				</button>

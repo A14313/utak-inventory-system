@@ -82,8 +82,6 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 		return onSubmit(formattedData);
 	};
 
-	console.log('Edit', isSubmitting);
-
 	return (
 		<form
 			id={formId}

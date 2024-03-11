@@ -16,25 +16,38 @@ function Modal({
 	const dialogRef = useRef(null);
 
 	useEffect(() => {
+		const handleKeyDown = (e) => {
+			if (e.key === 'Escape') closeModal && closeModal();
+		};
+
 		if (isOpen) {
 			dialogRef.current.showModal();
+			document.addEventListener('keydown', handleKeyDown);
 		} else {
 			dialogRef.current.close();
 		}
-	}, [isOpen]);
+
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [isOpen, closeModal]);
 
 	const handleClose = () => {
 		closeModal && closeModal();
 	};
 	return (
 		<dialog ref={dialogRef} className="modal modal-bottom lrg:modal-middle">
-			<div className="modal-box">
-				<h3 className="font-bold text-xl">{modalTitle || 'Add title to the modal'}</h3>
+			<div className="modal-box p-0">
+				<div className="p-[1.5em] bg-base-100 sticky top-0">
+					<h3 className="font-bold text-2xl med:text-3xl">
+						{modalTitle || 'Add title to the modal'}
+					</h3>
+				</div>
 
-				{children}
+				<div className="px-[1.5em] pt-[1em]">{children}</div>
 
 				{includeModalActions && (
-					<div className="modal-action">
+					<div className="modal-action px-[1.5em] pb-[1.5em] border border-error">
 						<form method="dialog">
 							{/* if there is a button in form, it will close the modal */}
 							<button className="btn btn-ghost" onClick={handleClose}>
@@ -46,7 +59,7 @@ function Modal({
 								'btn btn-primary text-slate-50 dark:text-slate-800',
 								submitButtonStyles,
 							)}
-							form={formToSubmit && formToSubmit}
+							form={formToSubmit || null}
 							type="submit"
 							disabled={isSubmitting}
 							onClick={handleSubmit}>
