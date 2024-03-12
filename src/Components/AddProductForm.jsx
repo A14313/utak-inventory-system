@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 // Utils
 import toCamelCase from 'src/utils/toCamelCase';
 import toCapitalize from 'src/utils/toCapitalize';
+import { SIZES } from 'src/utils/constants';
 
 // Components
 import Badge from './Badge';
@@ -48,15 +49,26 @@ const formInputs = [
 ];
 function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 	const [selectedCategories, setSelectedCategories] = useState([]);
+	const [selectedSize, setSelectedSize] = useState('Not applicable');
 	// Hook form
 	const {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
 		reset,
+		watch,
 	} = useForm({
 		resolver: zodResolver(productsSchema),
 	});
+
+	useEffect(() => {
+		const subscription = watch((data) => {
+			const { size } = data;
+			setSelectedSize(size);
+		});
+
+		return () => subscription.unsubscribe();
+	}, [watch]);
 
 	// Functions
 	const handleCategoryChange = ({ category }) => {
@@ -70,6 +82,7 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 
 	const onSubmitHandler = (data) => {
 		const formattedData = { ...data, categories: selectedCategories };
+		console.log('formattedData', formattedData);
 		return onSubmit(formattedData, resetForm);
 	};
 
@@ -77,6 +90,7 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 		reset();
 		setSelectedCategories([]);
 	};
+	console.log(selectedSize);
 
 	return (
 		<form
@@ -102,6 +116,35 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 					</React.Fragment>
 				);
 			})}
+			<div className="py-[1em]">
+				<h3 className="text-lg mb-[1em] font-medium">Size</h3>
+				<div className="flex flex-wrap gap-[.5em]">
+					{SIZES.map((el, index) => {
+						const id = uuid();
+						return (
+							<div key={index} className="form-control">
+								<input
+									{...register('size')}
+									type="radio"
+									id={id}
+									value={el.DISPLAY_NAME}
+									onChange={(e) => setSelectedSize(e.target.value)}
+									// name="size"
+									className="radio checked:bg-accent [&+label]:checked:bg-accent [&+label]:checked:text-slate-50 dark:[&+label]:checked:text-slate-800 [&+label]:focus-visible:border-info [&+label]:focus-visible:border-dashed [&+label]:focus-visible:border-4"
+									// checked
+									checked={el.DISPLAY_NAME === 'Not applicable'}
+								/>
+								{/* text-slate-50 dark:text-slate-800 */}
+								<label
+									className="label cursor-pointer text-sm sm2:text-base text-center border border-solid dark:border-slate-800 rounded-full px-[.8em] py-[.2em] hover:bg-gray-500 dark:hover:bg-gray-300 hover:text-slate-50 dark:hover:text-slate-800 transition-colors duration-500"
+									htmlFor={id}>
+									<span className="label-text">{el.DISPLAY_NAME}</span>
+								</label>
+							</div>
+						);
+					})}
+				</div>
+			</div>
 			<div className="py-[1em]">
 				<h3 className="text-lg mb-[1em] font-medium">Categories</h3>
 				<div className="flex flex-wrap gap-[.5em]">

@@ -1,5 +1,9 @@
 # Changelogs
 
+## 03-12-24(add-router) v1.3.0
+
+-   Added sizes in `Add product`
+
 ## 03-11-24(add-router) v1.2.3
 
 -   Change the order of the column in Table

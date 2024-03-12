@@ -10,3 +10,10 @@ export const CATEGORIES = [
 	{ DISPLAY_NAME: 'Cleaning Supplies' },
 	{ DISPLAY_NAME: 'Miscellaneous' },
 ];
+
+export const SIZES = [
+	{ DISPLAY_NAME: 'Not applicable' },
+	{ DISPLAY_NAME: 'Small' },
+	{ DISPLAY_NAME: 'Medium' },
+	{ DISPLAY_NAME: 'Large' },
+];
