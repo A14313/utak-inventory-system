@@ -1,5 +1,10 @@
 # Changelogs
 
+## 03-12-24(add-router) v1.4.0
+
+-   Added `STRINGS` to the `constants`
+-   Implemented the size in the `AddProductForm`
+
 ## 03-12-24(add-router) v1.3.0
 
 -   Added sizes in `Add product`

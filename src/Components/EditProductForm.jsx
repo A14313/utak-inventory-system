@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,11 +51,18 @@ const formInputs = [
 function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 	const navigate = useNavigate();
 	const [selectedCategories, setSelectedCategories] = useState(preloadedValues?.categories || []);
+	const [selectedSize, setSelectedSize] = useState(preloadedValues?.size);
 	const {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
 	} = useForm({ defaultValues: preloadedValues, resolver: zodResolver(productsSchema) });
+
+	useEffect(() => {
+		if (preloadedValues && preloadedValues.size) {
+			setSelectedSize(preloadedValues.size);
+		}
+	}, [preloadedValues]);
 
 	// Functions
 	const handleCategoryChange = ({ category }) => {

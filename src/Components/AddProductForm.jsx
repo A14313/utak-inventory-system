@@ -58,6 +58,9 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 		reset,
 		watch,
 	} = useForm({
+		defaultValues: {
+			size: 'Not applicable',
+		},
 		resolver: zodResolver(productsSchema),
 	});
 
@@ -81,8 +84,7 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 	};
 
 	const onSubmitHandler = (data) => {
-		const formattedData = { ...data, categories: selectedCategories };
-		console.log('formattedData', formattedData);
+		const formattedData = { ...data, categories: selectedCategories, size: selectedSize };
 		return onSubmit(formattedData, resetForm);
 	};
 
@@ -90,7 +92,6 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 		reset();
 		setSelectedCategories([]);
 	};
-	console.log(selectedSize);
 
 	return (
 		<form
@@ -128,21 +129,31 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 									type="radio"
 									id={id}
 									value={el.DISPLAY_NAME}
-									onChange={(e) => setSelectedSize(e.target.value)}
-									// name="size"
-									className="radio checked:bg-accent [&+label]:checked:bg-accent [&+label]:checked:text-slate-50 dark:[&+label]:checked:text-slate-800 [&+label]:focus-visible:border-info [&+label]:focus-visible:border-dashed [&+label]:focus-visible:border-4"
-									// checked
-									checked={el.DISPLAY_NAME === 'Not applicable'}
+									className="sr-only radio checked:bg-accent [&+label]:focus-visible:border-info [&+label]:focus-visible:border-dashed [&+label]:focus-visible:border-4"
+									checked={el.DISPLAY_NAME === selectedSize}
 								/>
-								{/* text-slate-50 dark:text-slate-800 */}
+
 								<label
-									className="label cursor-pointer text-sm sm2:text-base text-center border border-solid dark:border-slate-800 rounded-full px-[.8em] py-[.2em] hover:bg-gray-500 dark:hover:bg-gray-300 hover:text-slate-50 dark:hover:text-slate-800 transition-colors duration-500"
+									className={twMerge(
+										'label cursor-pointer text-sm sm2:text-base text-center border border-solid dark:border-slate-800 rounded-full px-[.8em] py-[.2em] hover:bg-gray-500 dark:hover:bg-gray-300 hover:text-slate-50 dark:hover:text-slate-800 transition-colors duration-500',
+										el.DISPLAY_NAME === selectedSize ? 'bg-accent  ' : '',
+									)}
 									htmlFor={id}>
-									<span className="label-text">{el.DISPLAY_NAME}</span>
+									<span
+										className={twMerge(
+											'label-text',
+											el.DISPLAY_NAME === selectedSize
+												? 'text-slate-50 dark:text-slate-800'
+												: '',
+										)}>
+										{el.DISPLAY_NAME}
+									</span>
 								</label>
 							</div>
 						);
 					})}
+
+					{errors?.size && <p className="text-error">{errors?.size.message}</p>}
 				</div>
 			</div>
 			<div className="py-[1em]">
