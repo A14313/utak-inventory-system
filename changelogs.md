@@ -1,5 +1,9 @@
 # Changelogs
 
+## 03-13-24(add-router) v1.4.1
+
+-   Added `BadgeRadio`
+
 ## 03-12-24(add-router) v1.4.0
 
 -   Added `STRINGS` to the `constants`
