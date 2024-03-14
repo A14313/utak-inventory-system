@@ -6,19 +6,21 @@ This is my solution to the pre assessment of UtakPOS
 
 ### Built with
 
--   Mobile-first workflow
+-   React.js for building user interface components ⚛
+-   Firebase 🚀
+-   Mobile-first workflow 📱
 -   Semantic HTML5 markup
 -   Flexbox
 -   Tailwind CSS as a utility-first CSS framework
 
 ### Features
 
--   Added mobile layout, from 320px up to the largest possible screen
+-   Added mobile layout, from 320px up to the largest possible screen 📱
 -   Fully Responsive Website
 
 ### Links
 
--   [Live Site URL]()
+-   [Live Site URL](https://utak-inventory-system.vercel.app)
 
 ## Author
 
