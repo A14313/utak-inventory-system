@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { DateTime } from 'luxon';
 
 // Firebase
 import app from 'src/dbConnection/firebase';
@@ -11,7 +12,7 @@ import { EditProductForm, Modal } from 'src/Components';
 
 // Utils
 import toastConfigs from 'src/utils/toastConfigs';
-import { CATEGORIES } from 'src/utils/constants';
+import { CATEGORIES, SIZES } from 'src/utils/constants';
 
 function EditPage() {
 	const navigate = useNavigate();
@@ -34,18 +35,7 @@ function EditPage() {
 			const dbRef = ref(db, `Products/${product.firebaseId}`);
 			try {
 				await toast.promise(
-					new Promise((resolve, reject) => {
-						const randomNum = Math.floor(Math.random() * 5000);
-						console.log(randomNum);
-						setTimeout(() => {
-							if (randomNum <= 3000) {
-								set(dbRef, data);
-								resolve(data);
-							} else {
-								reject();
-							}
-						}, randomNum);
-					}),
+					set(dbRef, data),
 					{
 						pending: 'Updating product',
 						success: 'Successfully updated product',
@@ -79,11 +69,22 @@ function EditPage() {
 				<h1 className="font-bold text-xl sm1:text-3xl sm2:text-4xl mt-[1em] py-[.5em] text-start">
 					Update product
 				</h1>
+				<h2 className="text-lg sm1:text-2xl sm2:text-3xl my-5 text-primary">
+					{product.name}
+				</h2>
+				<small className="block text-gray-400 font-light">
+					Created at: {DateTime.fromMillis(product.createdAt).toFormat('MMMM d, yyyy')}
+				</small>
+				<small className="block text-gray-400 font-light">
+					Last modified:{' '}
+					{DateTime.fromMillis(product.updatedAt).toFormat('MMMM d, yyyy HH:mm')}
+				</small>
 				{product ? (
 					<EditProductForm
 						preloadedValues={formattedProduct}
 						onSubmit={updateProduct}
 						categories={CATEGORIES}
+						sizes={SIZES}
 						formId="editForm"
 					/>
 				) : (

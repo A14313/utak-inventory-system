@@ -14,6 +14,7 @@ import generateDateTime from 'src/utils/generateDateTime';
 // Components
 import Badge from './Badge';
 import Input from './Input';
+import BadgeRadio from './BadgeRadio';
 
 // Schema
 import productsSchema from 'src/formSchemas/productsSchema';
@@ -48,7 +49,7 @@ const formInputs = [
 	},
 ];
 
-function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
+function EditProductForm({ preloadedValues, categories, sizes, onSubmit, formId }) {
 	const navigate = useNavigate();
 	const [selectedCategories, setSelectedCategories] = useState(preloadedValues?.categories || []);
 	const [selectedSize, setSelectedSize] = useState(preloadedValues?.size);
@@ -62,7 +63,8 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 		if (preloadedValues && preloadedValues.size) {
 			setSelectedSize(preloadedValues.size);
 		}
-	}, [preloadedValues]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []); // I want to run it once
 
 	// Functions
 	const handleCategoryChange = ({ category }) => {
@@ -74,6 +76,10 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 		}
 	};
 
+	const handleSizeChange = (e) => {
+		setSelectedSize(e.target.value);
+	};
+
 	const onSubmitHandler = (data) => {
 		const formattedData = {
 			...preloadedValues,
@@ -83,6 +89,7 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 			stock: Number(data.stock),
 			updatedAt: generateDateTime({ isUnix: true }),
 			categories: selectedCategories,
+			size: selectedSize,
 		};
 
 		delete formattedData.firebaseId;
@@ -114,6 +121,25 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 					</React.Fragment>
 				);
 			})}
+			<div className="py-[1em]">
+				<h3 className="text-lg mb-[1em] font-medium">Size</h3>
+				<div className="flex flex-wrap gap-[.5em]">
+					{sizes.map((el, index) => {
+						return (
+							<BadgeRadio
+								key={index}
+								{...register('size')}
+								label={el.DISPLAY_NAME}
+								isActive={el.DISPLAY_NAME === selectedSize}
+								value={el.DISPLAY_NAME}
+								onChange={handleSizeChange}
+							/>
+						);
+					})}
+
+					{errors?.size && <p className="text-error">{errors?.size.message}</p>}
+				</div>
+			</div>
 			<div className="py-[1em]">
 				<h3 className="text-lg mb-[1em] font-medium">Categories</h3>
 				<div className="flex flex-wrap gap-[.5em]">
@@ -167,6 +193,7 @@ function EditProductForm({ preloadedValues, categories, onSubmit, formId }) {
 EditProductForm.propTypes = {
 	preloadedValues: PropTypes.object,
 	categories: PropTypes.array,
+	sizes: PropTypes.array,
 	onSubmit: PropTypes.func,
 	formId: PropTypes.string,
 };

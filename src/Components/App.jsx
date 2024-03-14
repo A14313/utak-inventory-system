@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, createHashRouter } from 'react-router-dom';
 
 import { DashboardPage, EditPage } from 'src/Pages';
 import { DashboardLayout } from 'src/Layouts';
@@ -6,7 +6,8 @@ import { DashboardLayout } from 'src/Layouts';
 // Loaders
 import editProductLoader from 'src/utils/loaders/editLoader';
 
-const router = createBrowserRouter([
+// Please see the note below
+const router = createHashRouter([
 	{
 		path: '/',
 		element: <DashboardLayout />,
@@ -28,3 +29,6 @@ function App() {
 }
 
 export default App;
+
+// Notes:
+// I only used the hashrouter so that it has no error on production when refreshing the page.
