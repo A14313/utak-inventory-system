@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { STRINGS } from 'src/utils/constants';
+
 const characterMinLength = 2;
 const characterMaxLength = 50;
 
@@ -15,14 +17,23 @@ const productsSchema = z.object({
 		}),
 
 	stock: z.string().trim().min(1, {
-		message: 'Stocks field cannot be empty',
+		message: STRINGS.STOCK_CANNOT_BE_EMPTY,
 	}),
 	price: z.string().trim().min(1, {
-		message: 'Price field cannot be empty',
+		message: STRINGS.PRICE_CANNOT_BE_EMPTY,
 	}),
 	cost: z.string().trim().min(1, {
-		message: 'Cost field cannot be empty',
+		message: STRINGS.COST_CANNOT_BE_EMPTY,
 	}),
+	size: z
+		.string({
+			required_error: STRINGS.SIZE_CANNOT_BE_EMPTY,
+			invalid_type_error: STRINGS.SIZE_CANNOT_BE_EMPTY,
+		})
+		.trim()
+		.min(1, {
+			message: STRINGS.SIZE_CANNOT_BE_EMPTY,
+		}),
 });
 
 export default productsSchema;

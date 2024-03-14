@@ -1,5 +1,25 @@
 # Changelogs
 
+## 03-14-24(add-sizes) v1.4.2
+
+-   Fully implemented the `sizes` option for Adding or Editing
+    a product.
+-   Showed the `createdAt` and `updatedAt` to the edit product page
+-   Used `createHashRouter`.
+
+## 03-13-24(add-sizes) v1.4.1
+
+-   Added `BadgeRadio`
+
+## 03-12-24(add-sizes) v1.4.0
+
+-   Added `STRINGS` to the `constants`
+-   Implemented the size in the `AddProductForm`
+
+## 03-12-24(add-router) v1.3.0
+
+-   Added sizes in `Add product`
+
 ## 03-11-24(add-router) v1.2.3
 
 -   Change the order of the column in Table

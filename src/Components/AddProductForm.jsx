@@ -8,10 +8,12 @@ import PropTypes from 'prop-types';
 // Utils
 import toCamelCase from 'src/utils/toCamelCase';
 import toCapitalize from 'src/utils/toCapitalize';
+import { SIZES } from 'src/utils/constants';
 
 // Components
 import Badge from './Badge';
 import Input from './Input';
+import BadgeRadio from './BadgeRadio';
 
 // Schema
 import productsSchema from 'src/formSchemas/productsSchema';
@@ -48,15 +50,29 @@ const formInputs = [
 ];
 function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 	const [selectedCategories, setSelectedCategories] = useState([]);
+	const [selectedSize, setSelectedSize] = useState('Not applicable');
 	// Hook form
 	const {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
 		reset,
+		watch,
 	} = useForm({
+		defaultValues: {
+			size: 'Not applicable',
+		},
 		resolver: zodResolver(productsSchema),
 	});
+
+	useEffect(() => {
+		const subscription = watch((data) => {
+			const { size } = data;
+			setSelectedSize(size);
+		});
+
+		return () => subscription.unsubscribe();
+	}, [watch]);
 
 	// Functions
 	const handleCategoryChange = ({ category }) => {
@@ -69,7 +85,7 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 	};
 
 	const onSubmitHandler = (data) => {
-		const formattedData = { ...data, categories: selectedCategories };
+		const formattedData = { ...data, categories: selectedCategories, size: selectedSize };
 		return onSubmit(formattedData, resetForm);
 	};
 
@@ -102,6 +118,24 @@ function AddProductForm({ categories, onSubmit, formId, handleCancel }) {
 					</React.Fragment>
 				);
 			})}
+			<div className="py-[1em]">
+				<h3 className="text-lg mb-[1em] font-medium">Size</h3>
+				<div className="flex flex-wrap gap-[.5em]">
+					{SIZES.map((el, index) => {
+						return (
+							<BadgeRadio
+								key={index}
+								{...register('size')}
+								label={el.DISPLAY_NAME}
+								isActive={el.DISPLAY_NAME === selectedSize}
+								value={el.DISPLAY_NAME}
+							/>
+						);
+					})}
+
+					{errors?.size && <p className="text-error">{errors?.size.message}</p>}
+				</div>
+			</div>
 			<div className="py-[1em]">
 				<h3 className="text-lg mb-[1em] font-medium">Categories</h3>
 				<div className="flex flex-wrap gap-[.5em]">

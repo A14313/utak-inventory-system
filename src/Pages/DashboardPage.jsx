@@ -18,8 +18,8 @@ import toastConfigs from 'src/utils/toastConfigs';
 import { CATEGORIES } from 'src/utils/constants';
 import deleteProduct from 'src/utils/deleteProduct';
 
-const tableHeadings = ['Name', 'Stock', 'Price', 'Cost', 'Categories', 'Actions'];
-const tableDataCells = ['name', 'stock', 'price', 'cost', 'categories', 'actions'];
+const tableHeadings = ['Name', 'Stock', 'Price', 'Cost', 'Categories', 'Size', 'Actions'];
+const tableDataCells = ['name', 'stock', 'price', 'cost', 'categories', 'size', 'actions'];
 
 function DashboardPage() {
 	const navigate = useNavigate();
@@ -27,8 +27,6 @@ function DashboardPage() {
 	// Delete function states
 	const [deleteProductDialogIsOpen, setDeleteProductDialogIsOpen] = useState(false);
 	const [deleteId, setDeleteId] = useState('');
-
-	// Testing
 	const [disableButton, setDisableButton] = useState(false);
 
 	// Fetch data
@@ -79,19 +77,7 @@ function DashboardPage() {
 			setDisableButton(true);
 
 			await toast.promise(
-				new Promise((resolve, reject) => {
-					const randomNum = Math.floor(Math.random() * 5000);
-					console.log(randomNum);
-					setTimeout(() => {
-						if (randomNum <= 3000) {
-							set(newDocRef, formattedData);
-							resolve(formattedData);
-						} else {
-							reject();
-							setDisableButton(false);
-						}
-					}, randomNum);
-				}),
+				set(newDocRef, formattedData),
 				{
 					pending: 'Creating product',
 					success: 'Successfully added the product',
@@ -232,7 +218,6 @@ function DashboardPage() {
 				closeModal={() => setAddProductModalIsOpen(false)}>
 				<AddProductForm
 					categories={CATEGORIES}
-					// formId="forms"
 					onSubmit={(data, resetForm) => {
 						setAddProductModalIsOpen(false);
 						return addProduct({ data, resetForm });
