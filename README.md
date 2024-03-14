@@ -20,7 +20,7 @@ This is my solution to the pre assessment of UtakPOS
 
 ### Links
 
--   [Live Site URL](https://utak-inventory-system.vercel.app)
+-   [Live Site URL](https://utak-inventory-system2024.vercel.app)
 
 ## Author
 
